@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Define variables for later use
+
+RESOURCE_GROUP=my-resource-group
+AZURE_REGION=centralus
+AZURE_APP_PLAN=myappplan-$RANDOM
+AZURE_WEB_APP=mywebapp-$RANDOM
+
+# Create a resource group.
+az group create --name $RESOURCE_GROUP --location $AZURE_REGION
+
+# List all the respurce groups
+az group list --output table
+
+az group list --query "[?name == '$RESOURCE_GROUP']"
+
+az appservice plan create --name $AZURE_APP_PLAN --resource-group $RESOURCE_GROUP --location $AZURE_REGION --sku FREE
+
+
+az webapp create --name $AZURE_WEB_APP --resource-group $RESOURCE_GROUP --plan $AZURE_APP_PLAN
+az webapp config appsettings set -g $RESOURCE_GROUP -n $AZURE_WEB_APP --settings PROJECT=code/web-app/ToDoApp/ToDoApp/ToDoApp.csproj
+az webapp list --output table
+
+curl $AZURE_WEB_APP.azurewebsites.net
+
+
+# az webapp deployment source config --name $AZURE_WEB_APP --resource-group $RESOURCE_GROUP --repo-url "https://github.com/Azure-Samples/php-docs-hello-world" --branch master --manual-integration
+
+
+az webapp deployment source config --name $AZURE_WEB_APP --resource-group $RESOURCE_GROUP --repo-url "https://github.com/dumindukm/try-azure-devops" --branch master --manual-integration
+
+# delete deplpyment
+az webapp deployment source delete --name $AZURE_WEB_APP --resource-group $RESOURCE_GROUP
+
+# enable continuois deployment
+git_token=<token>
+az webapp deployment source config --name $AZURE_WEB_APP --resource-group $RESOURCE_GROUP --repo-url "https://github.com/dumindukm/try-azure-devops" --branch master --git-token $git_token
+
+# Change token
+az webapp deployment source update-token --git-token --subscription Pay-As-You-Go
+
+az group delete --name $RESOURCE_GROUP
