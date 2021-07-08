@@ -41,3 +41,34 @@ az webapp deployment source config --name $AZURE_WEB_APP --resource-group $RESOU
 az webapp deployment source update-token --git-token --subscription Pay-As-You-Go
 
 az group delete --name $RESOURCE_GROUP
+
+##### Commands for create Service Principal #######
+
+# Create service principal with Password based authentication
+az ad sp create-for-rbac --name DevSp
+
+# list service principals
+az ad sp list
+az ad sp list --show-mine --query "[].{id:appId, tenant:appOwnerTenantId}"
+
+# add roles to service principal. Here APP_ID can be taken from az ad sp list
+az role assignment create --assignee APP_ID --role Reader
+az role assignment delete --assignee APP_ID --role Contributor
+
+az role assignment list --assignee APP_ID
+
+# sign with service principal
+az login --service-principal --username APP_ID --password PASSWORD --tenant TENANT_ID
+
+# create resource group
+az group create --name $RESOURCE_GROUP --location $AZURE_REGION
+
+# create storage account
+CONTAINERNAME=devcnt
+az storage account create --name $CONTAINERNAME --resource-group $RESOURCE_GROUP  --kind StorageV2 --sku Standard_LRS --location $AZURE_REGION
+
+# get storage account keys
+az storage account keys list --n $CONTAINERNAME --resource-group $RESOURCE_GROUP
+
+# reset credentials
+az ad sp credential reset --name APP_ID
