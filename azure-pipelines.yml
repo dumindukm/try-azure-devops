@@ -43,7 +43,7 @@ steps:
     projects: '**/ToDoApp.csproj'
     publishWebProjects: false
     arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
-    zipAfterPublish: true
+    zipAfterPublish: true # this is for --logger trx
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
