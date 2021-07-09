@@ -32,7 +32,7 @@ steps:
   displayName: 'Publish the project'
   inputs:
     command: 'publish'
-    projects: '**/ToDoApp.csproj.csproj'
+    projects: '**/ToDoApp.csproj'
     publishWebProjects: false
     arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
     zipAfterPublish: true
