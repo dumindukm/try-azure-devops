@@ -29,10 +29,18 @@ steps:
     projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Run unit tests - $(buildConfiguration)'
+  inputs:
+    command: 'test'
+    arguments: '--no-build --configuration $(buildConfiguration)'
+    publishTestResults: true
+    projects: '**/TestProjectToDoApp.csproj'
+
+- task: DotNetCoreCLI@2
   displayName: 'Publish the project'
   inputs:
     command: 'publish'
-    projects: '**/*ToDoApp.csproj'
+    projects: '**/ToDoApp.csproj'
     publishWebProjects: false
     arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
     zipAfterPublish: true
