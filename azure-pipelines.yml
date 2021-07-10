@@ -11,8 +11,8 @@ variables:
   releaseBranchName: 'release'
 
 schedules:
-- cron: '45 9 * * *'
-  displayName: 'Deploy every day at 3 A.M.'
+- cron: '15 10 * * *'
+  displayName: 'Deploy every day at schedule time'
   branches:
     include:
     - release
@@ -136,4 +136,27 @@ stages:
             inputs:
               azureSubscription: 'devops-service-connection'
               appName: '$(webappnameTest)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+
+- stage: 'Staging'
+  displayName: 'Deploy to the staging environment'
+  dependsOn: Test
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: staging
+    variables:
+    - group: 'ReleaseDev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - task: AzureWebApp@1
+            displayName: 'Azure App Service Deploy: website'
+            inputs:
+              azureSubscription: 'devops-service-connection'
+              appName: '$(webappnameStaging)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
